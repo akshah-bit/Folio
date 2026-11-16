@@ -1,0 +1,339 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-display: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-sans: "DM Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  html, body, #root {
+    height: 100%;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+  }
+
+  code, pre, kbd {
+    font-family: var(--font-mono);
+  }
+
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Custom typography & rendered note styles */
+.folio-prose {
+  font-family: var(--font-sans);
+  font-size: 0.96875rem;
+  line-height: 1.72;
+  color: #1e293b;
+}
+
+.dark .folio-prose {
+  color: #e2e8f0;
+  letter-spacing: 0.005em;
+}
+
+.folio-prose h1 {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  color: #0f172a;
+}
+.dark .folio-prose h1 {
+  color: #f8fafc;
+}
+
+.folio-prose h2 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.32;
+  letter-spacing: -0.015em;
+  margin-top: 1.65rem;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+  color: #0f172a;
+}
+.dark .folio-prose h2 {
+  color: #f1f5f9;
+  border-bottom-color: rgba(148, 163, 184, 0.14);
+}
+
+.folio-prose h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 1.35rem;
+  margin-bottom: 0.45rem;
+  color: #0f172a;
+}
+.dark .folio-prose h3 {
+  color: #f1f5f9;
+}
+
+.folio-prose p {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.folio-prose ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-top: 0.6rem;
+  margin-bottom: 0.85rem;
+}
+
+.folio-prose ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-top: 0.6rem;
+  margin-bottom: 0.85rem;
+}
+
+.folio-prose li {
+  margin-top: 0.28rem;
+  margin-bottom: 0.28rem;
+}
+
+.folio-prose li > ul,
+.folio-prose li > ol {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.folio-prose blockquote {
+  margin: 1rem 0;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background-color: #f8fafc;
+  color: #475569;
+}
+.dark .folio-prose blockquote {
+  border-color: #1e293b;
+  background-color: #111827;
+  color: #94a3b8;
+}
+
+.folio-prose blockquote p:first-child {
+  margin-top: 0;
+}
+.folio-prose blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.folio-prose :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.84em;
+  padding: 0.14rem 0.38rem;
+  border-radius: 0.3rem;
+  background-color: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+}
+.dark .folio-prose :not(pre) > code {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  border-color: #334155;
+}
+
+.folio-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.15rem 0;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.dark .folio-prose table {
+  border-color: #1e293b;
+}
+
+.folio-prose th {
+  text-align: left;
+  font-family: var(--font-display);
+  font-weight: 600;
+  padding: 0.6rem 0.85rem;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  color: #0f172a;
+}
+.dark .folio-prose th {
+  background-color: #111827;
+  border-bottom-color: #1e293b;
+  color: #f1f5f9;
+}
+
+.folio-prose td {
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: top;
+}
+.dark .folio-prose td {
+  border-bottom-color: #1e293b;
+}
+
+.folio-prose tr:last-child td {
+  border-bottom: none;
+}
+
+.folio-prose hr {
+  border: 0;
+  border-top: 1px solid #e2e8f0;
+  margin: 1.5rem 0;
+}
+.dark .folio-prose hr {
+  border-top-color: #1e293b;
+}
+
+.folio-prose a {
+  color: #2563eb;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.dark .folio-prose a {
+  color: #60a5fa;
+}
+
+.folio-prose .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.65rem 0.25rem;
+  margin: 0.85rem 0;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.folio-prose .katex-display::-webkit-scrollbar {
+  display: none;
+}
+
+/* Highlight.js balanced light/dark token coloring */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-section,
+.hljs-link {
+  color: #2563eb;
+}
+.dark .hljs-keyword,
+.dark .hljs-selector-tag,
+.dark .hljs-literal,
+.dark .hljs-section,
+.dark .hljs-link {
+  color: #93c5fd;
+}
+
+.hljs-string,
+.hljs-title,
+.hljs-name,
+.hljs-type,
+.hljs-attribute,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+  color: #059669;
+}
+.dark .hljs-string,
+.dark .hljs-title,
+.dark .hljs-name,
+.dark .hljs-type,
+.dark .hljs-attribute,
+.dark .hljs-symbol,
+.dark .hljs-bullet,
+.dark .hljs-addition {
+  color: #6ee7b7;
+}
+
+.hljs-comment,
+.hljs-quote,
+.hljs-meta {
+  color: #64748b;
+  font-style: italic;
+}
+
+.hljs-number,
+.hljs-regexp,
+.hljs-variable,
+.hljs-template-variable {
+  color: #d97706;
+}
+.dark .hljs-number,
+.dark .hljs-regexp,
+.dark .hljs-variable,
+.dark .hljs-template-variable {
+  color: #fcd34d;
+}
+
+.hljs-function .hljs-title,
+.hljs-built_in {
+  color: #0284c7;
+}
+.dark .hljs-function .hljs-title,
+.dark .hljs-built_in {
+  color: #38bdf8;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  html, body, #root {
+    height: auto !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+  main, main > div, main .overflow-y-auto {
+    height: auto !important;
+    overflow: visible !important;
+  }
+}

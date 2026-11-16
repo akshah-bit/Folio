@@ -1,0 +1,8 @@
+{
+  "name": "Folio",
+  "description": "Precision AI-to-Notes workspace and Manifest V3 Chrome Extension builder that preserves exact formatting, LaTeX math, code blocks, tables, and embedded images from AI platforms.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

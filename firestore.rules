@@ -1,0 +1,130 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidNotebook(data, userId, notebookId) {
+      return data.keys().hasAll(['id', 'ownerId', 'name', 'createdAt', 'serverUpdatedAt']) &&
+        data.keys().hasOnly(['id', 'ownerId', 'name', 'createdAt', 'serverUpdatedAt']) &&
+        data.id == notebookId &&
+        data.ownerId == userId &&
+        data.ownerId == request.auth.uid &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+        data.createdAt is number &&
+        data.serverUpdatedAt == request.time;
+    }
+
+    function isValidNote(data, userId, noteId) {
+      return data.keys().hasAll([
+          'id', 'ownerId', 'title', 'notebookId', 'sourcePlatform',
+          'markdown', 'pinned', 'assetIds', 'createdAt', 'updatedAt', 'serverUpdatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'title', 'notebookId', 'sourcePlatform',
+          'sourceUrl', 'markdown', 'pinned', 'assetIds', 'createdAt', 'updatedAt', 'serverUpdatedAt'
+        ]) &&
+        data.id == noteId &&
+        data.ownerId == userId &&
+        data.ownerId == request.auth.uid &&
+        data.title is string && data.title.size() <= 200 &&
+        isValidId(data.notebookId) &&
+        data.sourcePlatform in ['ChatGPT', 'Claude', 'Gemini', 'Perplexity', 'DeepSeek', 'Web', 'Manual'] &&
+        (!('sourceUrl' in data) || (data.sourceUrl is string && data.sourceUrl.size() <= 1000)) &&
+        data.markdown is string && data.markdown.size() <= 500000 &&
+        data.pinned is bool &&
+        data.assetIds is list && data.assetIds.size() <= 25 &&
+        (data.assetIds.size() == 0 || (data.assetIds[0] is string && data.assetIds[0].size() <= 128)) &&
+        data.createdAt is number &&
+        data.updatedAt is number &&
+        data.serverUpdatedAt == request.time;
+    }
+
+    function isValidAsset(data, userId, assetId) {
+      return data.keys().hasAll([
+          'id', 'ownerId', 'noteId', 'name', 'mimeType', 'dataUrl', 'createdAt', 'serverUpdatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'noteId', 'name', 'mimeType', 'dataUrl', 'caption', 'createdAt', 'serverUpdatedAt'
+        ]) &&
+        data.id == assetId &&
+        data.ownerId == userId &&
+        data.ownerId == request.auth.uid &&
+        isValidId(data.noteId) &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 200 &&
+        data.mimeType is string && data.mimeType.size() >= 1 && data.mimeType.size() <= 100 &&
+        data.dataUrl is string && data.dataUrl.size() >= 1 && data.dataUrl.size() <= 900000 &&
+        (!('caption' in data) || (data.caption is string && data.caption.size() <= 300)) &&
+        data.createdAt is number &&
+        data.serverUpdatedAt == request.time;
+    }
+
+    match /users/{userId}/notebooks/{notebookId} {
+      allow get: if isOwner(userId) && isValidId(notebookId);
+      allow list: if isOwner(userId) && resource.data.ownerId == request.auth.uid;
+      allow create: if isOwner(userId) && isValidId(notebookId) &&
+        isValidNotebook(incoming(), userId, notebookId);
+      allow update: if isOwner(userId) && isValidId(notebookId) &&
+        isValidNotebook(incoming(), userId, notebookId) &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['name', 'serverUpdatedAt']);
+      allow delete: if isOwner(userId) && isValidId(notebookId);
+    }
+
+    match /users/{userId}/notes/{noteId} {
+      allow get: if isOwner(userId) && isValidId(noteId);
+      allow list: if isOwner(userId) && resource.data.ownerId == request.auth.uid;
+      allow create: if isOwner(userId) && isValidId(noteId) &&
+        isValidNote(incoming(), userId, noteId);
+      allow update: if isOwner(userId) && isValidId(noteId) &&
+        isValidNote(incoming(), userId, noteId) &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'title', 'notebookId', 'sourcePlatform', 'sourceUrl',
+          'markdown', 'pinned', 'assetIds', 'updatedAt', 'serverUpdatedAt'
+        ]);
+      allow delete: if isOwner(userId) && isValidId(noteId);
+    }
+
+    match /users/{userId}/assets/{assetId} {
+      allow get: if isOwner(userId) && isValidId(assetId);
+      allow list: if isOwner(userId) && resource.data.ownerId == request.auth.uid;
+      allow create: if isOwner(userId) && isValidId(assetId) &&
+        isValidAsset(incoming(), userId, assetId);
+      allow update: if isOwner(userId) && isValidId(assetId) &&
+        isValidAsset(incoming(), userId, assetId) &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().noteId == existing().noteId &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'name', 'mimeType', 'dataUrl', 'caption', 'serverUpdatedAt'
+        ]);
+      allow delete: if isOwner(userId) && isValidId(assetId);
+    }
+  }
+}

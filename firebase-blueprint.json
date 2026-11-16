@@ -1,0 +1,181 @@
+{
+  "entities": {
+    "Notebook": {
+      "title": "Notebook",
+      "description": "A user-owned folder grouping study notes.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "createdAt": {
+          "type": "number"
+        },
+        "serverUpdatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "ownerId", "name", "createdAt", "serverUpdatedAt"]
+    },
+    "Note": {
+      "title": "Note",
+      "description": "A markdown and LaTeX study note with asset references.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "notebookId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "sourcePlatform": {
+          "type": "string",
+          "enum": ["ChatGPT", "Claude", "Gemini", "Perplexity", "DeepSeek", "Web", "Manual"]
+        },
+        "sourceUrl": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "markdown": {
+          "type": "string",
+          "maxLength": 500000
+        },
+        "pinned": {
+          "type": "boolean"
+        },
+        "assetIds": {
+          "type": "array"
+        },
+        "createdAt": {
+          "type": "number"
+        },
+        "updatedAt": {
+          "type": "number"
+        },
+        "serverUpdatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "title",
+        "notebookId",
+        "sourcePlatform",
+        "markdown",
+        "pinned",
+        "assetIds",
+        "createdAt",
+        "updatedAt",
+        "serverUpdatedAt"
+      ]
+    },
+    "NoteAsset": {
+      "title": "NoteAsset",
+      "description": "An embedded image or SVG asset belonging to a user's note.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "noteId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "mimeType": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "dataUrl": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 900000
+        },
+        "caption": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "createdAt": {
+          "type": "number"
+        },
+        "serverUpdatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "noteId",
+        "name",
+        "mimeType",
+        "dataUrl",
+        "createdAt",
+        "serverUpdatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/notebooks/{notebookId}": {
+      "schema": { "$ref": "#/entities/Notebook" },
+      "description": "User-private notebooks for organizing notes."
+    },
+    "/users/{userId}/notes/{noteId}": {
+      "schema": { "$ref": "#/entities/Note" },
+      "description": "User-private notes synced across devices."
+    },
+    "/users/{userId}/assets/{assetId}": {
+      "schema": { "$ref": "#/entities/NoteAsset" },
+      "description": "User-private embedded images/SVGs synced separately to stay under 1MB document limits."
+    }
+  }
+}
